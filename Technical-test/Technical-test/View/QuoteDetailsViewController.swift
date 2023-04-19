@@ -9,7 +9,7 @@ import UIKit
 
 class QuoteDetailsViewController: UIViewController {
     
-    private var quote:Quote? = nil
+    private var quote: Quote? = nil
     
     let symbolLabel = UILabel()
     let nameLabel = UILabel()
@@ -18,8 +18,7 @@ class QuoteDetailsViewController: UIViewController {
     let readableLastChangePercentLabel = UILabel()
     let favoriteButton = UIButton()
     
-    
-    
+    private let storeManager: StoreManageProtocol = UserDefaultsStoreManager()
     
     init(quote:Quote) {
         super.init(nibName: nil, bundle: nil)
@@ -45,6 +44,7 @@ class QuoteDetailsViewController: UIViewController {
     }
     
     func addSubviews() {
+        guard let quote = quote else { return }
         
         symbolLabel.textAlignment = .center
         symbolLabel.font = .boldSystemFont(ofSize: 40)
@@ -64,8 +64,8 @@ class QuoteDetailsViewController: UIViewController {
         readableLastChangePercentLabel.layer.borderWidth = 1
         readableLastChangePercentLabel.layer.borderColor = UIColor.black.cgColor
         readableLastChangePercentLabel.font = .systemFont(ofSize: 30)
-        
-        favoriteButton.setTitle("Add to favorites", for: .normal)
+
+        favoriteButton.setTitle(quote.isFavorite ? "Remove from favorites" : "Add to favorites", for: .normal)
         favoriteButton.layer.cornerRadius = 6
         favoriteButton.layer.masksToBounds = true
         favoriteButton.layer.borderWidth = 3
@@ -121,7 +121,7 @@ class QuoteDetailsViewController: UIViewController {
                         
             favoriteButton.topAnchor.constraint(equalTo: readableLastChangePercentLabel.bottomAnchor, constant: 30),
             favoriteButton.centerXAnchor.constraint(equalTo: safeArea.centerXAnchor),
-            favoriteButton.widthAnchor.constraint(equalToConstant: 150),
+            favoriteButton.widthAnchor.constraint(equalToConstant: 190),
             favoriteButton.heightAnchor.constraint(equalToConstant: 44),
             
         ])
@@ -129,6 +129,9 @@ class QuoteDetailsViewController: UIViewController {
     
     
     @objc func didPressFavoriteButton(_ sender:UIButton!) {
-        // TODO
+        guard let quote = quote else { return }
+        storeManager.updateFavorite(quote)
+        self.quote?.isFavorite.toggle()
+        favoriteButton.setTitle(quote.isFavorite ? "Remove from favorites" : "Add to favorites", for: .normal)
     }
 }
